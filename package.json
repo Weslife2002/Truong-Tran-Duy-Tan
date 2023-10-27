@@ -1,0 +1,23 @@
+{
+  "name": "truong-tran-duy-tan",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Weslife2002/Truong-Tran-Duy-Tan.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Weslife2002/Truong-Tran-Duy-Tan/issues"
+  },
+  "homepage": "https://github.com/Weslife2002/Truong-Tran-Duy-Tan#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "readline": "^1.3.0"
+  }
+}
