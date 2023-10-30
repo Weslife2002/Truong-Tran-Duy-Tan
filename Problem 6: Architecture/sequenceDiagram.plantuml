@@ -1,0 +1,50 @@
+@startuml dashboard
+title Dashboard
+actor User
+control "Mobile Interface" as app
+
+entity "API gateway" as gateway
+entity "Authentication Server" as authServer
+entity "User Management Server" as userServer
+entity "Socket Io Server" as socketServer
+database "Redis Cache" as cache
+database "MySQL Database" as database
+
+
+activate gateway
+activate authServer
+activate database
+activate socketServer
+activate userServer
+activate cache
+activate app
+app -> socketServer: Listen to socket server
+User -> app: Login
+  app-> gateway: login()
+    gateway -> authServer: Validate user
+      authServer -> database: Query user
+      database --> authServer: User record
+      authServer -> authServer: Generate session token
+      authServer -> cache: Cache session token with user info
+    authServer --> gateway: Login success with session token
+  gateway --> app: Show login success, save session token
+User -> app: Do some action
+  app -> app: Action completed
+  app ->> gateway: increaseScore() with session token
+    gateway -> authServer: session token
+      authServer -> cache: get user info
+      cache --> authServer: user info
+    cache --> gateway: increaseScore() with user info
+    gateway ->> userServer: increaseScore() with user info
+      userServer -> database: update user 's score record
+      database --> userServer: updated user 's score record
+      userServer -> userServer: check if dashboard changes
+      opt dashboard changes
+        userServer ->> socketServer: updated dashboard
+        socketServer ->> app: send socket including updated dashboard
+        app -> app: update dashboard
+      end
+deactivate app
+
+
+
