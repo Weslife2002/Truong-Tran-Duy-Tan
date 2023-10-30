@@ -3,17 +3,20 @@ const { SQLiteDB } = require('./models/connection');
 async function getTask({params}, res) {
   try {
     const {id} = params;
-    const tasks = await new Promise((resolve, reject) => {
-
+    const task = await new Promise((resolve, reject) => {
+      let item = {};
       SQLiteDB.each(
-        `SELECT * from tasks WHERE id=${id}`, (err, row) => {
+        `SELECT * from tasks WHERE id=${id}`, 
+        (err, row) => {
         if (err) {
           reject(err);
         }
-        t
-      });
+        item = row;
+        },
+        () => resolve(item),
+      );
     })
-    return(res.status(200).send(row));
+    return(res.status(200).send(task));
   }
   catch(error) {
     console.log(error);
@@ -51,17 +54,19 @@ async function addTask({body}, res) {
   try {
     const {title, description} = body;
     
-    SQLiteDB.run(
-    `INSERT INTO tasks (title, description) VALUES (?, ?)`, 
-    [title, description],
-    (err) => {
-      if (err) {
-        logger.error('Error during insertion:', err);
-        return res.status(500).send("Failed to add task");
-      }
-    });
+    await new Promise((resolve, reject)=> {
+      SQLiteDB.run(
+      `INSERT INTO tasks (title, description) VALUES (?, ?)`, 
+      [title, description],
+      (err) => {
+        if (err) {
+          reject(err);
+        }
+        resolve();
+      });
+    })
   
-    return(res.send("Add task success"))
+    return(res.send("Add task success"));
   }
   catch(err) {
     logger.error(err);
@@ -74,17 +79,17 @@ async function updateTask({body, params}, res) {
     const { title, description } = body;
     const { id } = params;
 
-    SQLiteDB.each(`
-    UPDATE tasks
-    SET title = ${title}, description = ${description}
-    WHERE id=${id}
-    `, (err, row) => {
-      if (err) {
-        throw (err);
-      }
-    });
-
-    return(res.send("Update success!"));
+    await new Promise((resolve, reject)=> {
+      SQLiteDB.run(`UPDATE tasks SET title = ?, description = ? WHERE id = ?`,
+      [title, description, id],
+      (err) => {
+        if (err) {
+          reject (err);
+        }
+        resolve();
+      });
+    })
+    return(res.send("Update task success!"));
   }
   catch(error) {
     console.log(error);
@@ -96,16 +101,19 @@ async function deleteTask({params}, res) {
   try {
     const { id } = params;
   
-    SQLiteDB.each(`
-    DELETE FROM tasks
-    WHERE id = ${id}
-    `, (err, row) => {
-      if (err) {
-        throw (err);
-      }
-    });
+    await new Promise( (resolve, reject) => {
+      SQLiteDB.run(`
+      DELETE FROM tasks WHERE id = ?`,
+      [id],
+      (err) => {
+        if (err) {
+          reject (err);
+        }
+        resolve();
+      });
+    })
 
-    return(res.send("Delete success"))
+    return(res.send("Delete task success"))
   }
   catch(error) {
     console.log(error);
