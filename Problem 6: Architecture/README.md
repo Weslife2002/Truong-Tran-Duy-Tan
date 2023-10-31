@@ -2,11 +2,11 @@
 
 ## Requirement Analysis
 
-1. The score board need to be live updated, this means we need to open socket from server to client to send updated scores.
-In the case when there is not much concurrent customer, we can design the server following monolithic architecture, then we must have one module to handle the the socket connection.
-In case when there is a lot of concurrent customer and we want to scale the module that handle the socket connection independently
+1. The score board need to be live updated, which means we need to open sockets from server to clients to send updated dashboard result.
+If there aren't many concurrent customers, we can design the server following a monolithic architecture.
+However, if there are a lot of concurrent customers and we want to scale the module that handles the socket connection independently, a microservices architecture might be preferable.
 
-2. The malicious users need to be authorized to increase the score, that means the system requires user to provide session token to validate the action.
+1. Malicious users need to be authorized to increase the score. This means the system requires the user to provide a session token to validate the action.
 
 ## System architecture diagram
 
@@ -20,4 +20,4 @@ In this part, I assume that the application has many concurrent users and is fol
 
 ![generator](./dashboard.png)
 
-If the dashboard happens much more frequently than the score being updated then we may consider cache the dashboard result after each time there is change in the dashboard when after the increaseScore() function is completed.
+If the dashboard is updated much more frequently than the score, then we may consider caching the dashboard result each time there is a change in the dashboard after the increaseScore() function is completed.
